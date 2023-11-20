@@ -1,5 +1,5 @@
 {
-	"name": "obsidian-note-batcher",
+	"name": "note-batcher",
 	"version": "1.0.0",
 	"description": "Create all unresolvered links with a single click on your Obsidian vault",
 	"main": "main.js",
