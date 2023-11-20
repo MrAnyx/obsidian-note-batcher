@@ -15,4 +15,4 @@ As mentioned in the [official documentation](https://docs.obsidian.md/Plugins/Ge
 
 ## License
 
-[AGPL v3]()
+[AGPL v3](https://github.com/MrAnyx/obsidian-note-batcher/blob/master/LICENSE)
