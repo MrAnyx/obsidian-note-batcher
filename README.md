@@ -1,6 +1,6 @@
 # Note Batcher
 
-Note Batcher is an Obsidian plugin that allows people to easily and quickly create all unresolved links with a single click.
+Note Batcher is an Obsidian plugin that allows people to easily and quickly create all unresolved links with a single click. It uses the [Dataview API](https://github.com/blacksmithgu/obsidian-dataview) to list pages and outgoing links.
 
 ## Development
 
