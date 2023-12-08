@@ -79,6 +79,7 @@ export default class NoteBatcherPlugin extends Plugin {
 						.create(`${defaultFolder}/${outlink.path}.md`, "")
 						.then((file: TFile) => ok++)
 						.catch((err) => {
+							// If the link has already been pushed to the array
 							if (!nok.some((e) => e.to === outlink.path)) {
 								nok.push({
 									from: {
@@ -92,8 +93,6 @@ export default class NoteBatcherPlugin extends Plugin {
 				}
 			}
 		}
-
-		console.log(nok);
 
 		new Notice(
 			`Created ${ok} notes out of ${nok.length + ok} unresolved links.`

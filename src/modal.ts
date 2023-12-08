@@ -24,7 +24,7 @@ export class InvalidLlinkModal extends Modal {
 		});
 
 		this.nok.forEach((n) => {
-			linksContainer.createDiv({
+			const el = linksContainer.createDiv({
 				cls: "note-batcher-modal-link",
 				text: n.to,
 			});
