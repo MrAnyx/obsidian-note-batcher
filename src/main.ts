@@ -1,14 +1,16 @@
-import { App, Notice, Plugin, PluginSettingTab, Setting } from "obsidian";
+import {
+	App,
+	Notice,
+	Plugin,
+	PluginSettingTab,
+	Setting,
+	TFile,
+} from "obsidian";
 import { getAPI } from "obsidian-dataview";
-import { FolderInputSuggester } from "./Settings/FolderInputSuggester";
-
-interface PluginSettings {
-	defaultLocation: string;
-}
-
-const DEFAULT_SETTINGS: PluginSettings = {
-	defaultLocation: "",
-};
+import { FolderInputSuggester } from "./settings/FolderInputSuggester";
+import { DEFAULT_SETTINGS } from "./settings/settings";
+import { InvalidLlinkModal } from "./modal";
+import { InvalidLink, PluginSettings } from "./types.d";
 
 export default class NoteBatcherPlugin extends Plugin {
 	settings: PluginSettings;
@@ -39,9 +41,11 @@ export default class NoteBatcherPlugin extends Plugin {
 		}
 	}
 
-	batchCreate() {
+	async batchCreate() {
 		if (!this.isDataviewEnabled()) {
-			new Notice("You must install the Dataview plugin first.");
+			new Notice(
+				"You must install and enable the Dataview plugin first."
+			);
 			return;
 		}
 
@@ -55,16 +59,49 @@ export default class NoteBatcherPlugin extends Plugin {
 			return;
 		}
 
-		dv.pages().forEach((p: any) => {
-			p.file.outlinks.values.forEach((o: any) => {
-				const fileExist = !!dv.page(o.path)?.files;
-				const hasExtension = !!this.getExtension(o.path);
+		let ok = 0;
+		let nok: InvalidLink[] = [];
+		const pages: any[] = dv.pages();
+
+		// For each page
+		for (let i = 0; i < pages.length; i++) {
+			const page = pages[i];
+			const outlinks = page.file.outlinks.values;
+
+			// For each outgoing link of each page
+			for (let j = 0; j < outlinks.length; j++) {
+				const outlink = outlinks[j];
+				const fileExist = !!dv.page(outlink.path)?.files;
+				const hasExtension = !!this.getExtension(outlink.path);
 
 				if (!fileExist && !hasExtension) {
-					this.app.vault.create(`${defaultFolder}/${o.path}.md`, "");
+					await this.app.vault
+						.create(`${defaultFolder}/${outlink.path}.md`, "")
+						.then((file: TFile) => ok++)
+						.catch((err) => {
+							if (!nok.some((e) => e.to === outlink.path)) {
+								nok.push({
+									from: {
+										folder: page.file.folder,
+										filename: page.file.name,
+									},
+									to: outlink.path,
+								});
+							}
+						});
 				}
-			});
-		});
+			}
+		}
+
+		console.log(nok);
+
+		new Notice(
+			`Created ${ok} notes out of ${nok.length + ok} unresolved links.`
+		);
+
+		if (nok.length > 0) {
+			new InvalidLlinkModal(this.app, nok).open();
+		}
 	}
 
 	async onload() {

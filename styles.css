@@ -1,0 +1,11 @@
+.note-batcher-modal-title {
+    margin: 0;
+}
+
+.note-batcher-modal-content-el {
+    overflow: auto;
+}
+
+.note-batcher-modal-link {
+    color: red;
+}
